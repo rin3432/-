@@ -1,4 +1,5 @@
 #pragma once
+class Shadow;
 class Game : public IGameObject
 {
 private:
@@ -8,6 +9,7 @@ private:
 	SpotLight spotLight;
 
 	Model lightModel, bgModel, charaModel;
+	Shadow* shadow;
 
 	
 public:
@@ -24,6 +26,10 @@ public:
 	void InitSpotLight();
 
 	void SpotLight();
-	
+
+	void SetLight(Vector3 pos)
+	{
+		light.SetEyePos(pos);
+	}
 };
 

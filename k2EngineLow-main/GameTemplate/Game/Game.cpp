@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Game.h"
-
+#include "Shadow.h"
 
 
 Game::Game()
@@ -15,6 +15,8 @@ Game::~Game()
 
 bool Game::Start()
 {
+	shadow = NewGO<Shadow>(0,"shadow");
+
 	InitDirLight();
 	//InitPtLight();
 	InitAmbLight();
@@ -27,8 +29,7 @@ bool Game::Start()
 	
 	InitModel(bgModel, charaModel, lightModel, light);
 
-
-	
+	shadow->Start();
 
 	return true;
 }
@@ -55,6 +56,13 @@ void Game::Update()
 		qRot.SetRotationDegY(-1.0f);
 	}
 
+
+	/*charaModel.UpdateWorldMatrix(
+		{ -50,0,0 },
+		g_quatIdentity,
+		g_vec3One
+	);*/
+
 	//qRot.Apply(light.direction);
 	
 
@@ -74,19 +82,21 @@ void Game::Update()
 	g_camera3D->SetPosition(g_camera3D->GetTarget() + toPos);
 
 	light.SetEyePos(g_camera3D->GetPosition());
-	//light.eyePos = g_camera3D->GetPosition();
 
 	//SpotLight();
 	light.SetLight(directionLight, pointLight, spotLight);
-	bgModel.Draw(renderContext);
+
+	shadow->UpdateShadow();
+
+	//bgModel.Draw(renderContext);
 	charaModel.Draw(renderContext);
-	lightModel.Draw(renderContext);
+	//lightModel.Draw(renderContext);
 }
 
 void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Light& light)
 {
 	ModelInitData bgModelInitData;
-	bgModelInitData.m_tkmFilePath = "Assets/modelData/bg.tkm";
+	bgModelInitData.m_tkmFilePath = "Assets/modelData/flat.tkm";
 
 	// 使用するシェーダーファイルパスを設定する
 	bgModelInitData.m_fxFilePath = "Assets/shader/model.fx";
@@ -135,7 +145,7 @@ void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Ligh
 
 void Game::InitDirLight()
 {
-	directionLight.SetDirection(0.0f, 0.0f, 1.0f);
+	directionLight.SetDirection(0.0f, -1.0f, 0.0f);
 	//directionLight.NormalizeDirection();
 	directionLight.SetColor(0.5f, 0.5f, 0.5f);
 
@@ -151,7 +161,7 @@ void Game::InitPtLight()
 
 void Game::InitAmbLight()
 {
-	light.SetAmbient(0.3f, 0.3f, 0.3f);
+	light.SetAmbient(0.5f, 0.5f, 0.5f);
 }
 
 void Game::InitSpotLight()

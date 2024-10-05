@@ -211,7 +211,7 @@ float4 PSMain(SPSIn psIn) : SV_Target0
     ambient *= ambientPower;
     
     
-    float lig = normalLig + specLig /*+ ambient*/;
+    float lig = normalLig + specLig + ambient;
     
     
     float3 directionLig = CalcLigFromDirectionLight(psIn);

@@ -20,6 +20,7 @@ namespace nsK2EngineLow {
 		Vector3 skyColor;
 		float pad3;
 		Vector3 groundNormal;
+
 	public:
 		void SetEyePos(const Vector3& pos)
 		{
