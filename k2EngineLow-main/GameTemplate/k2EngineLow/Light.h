@@ -11,7 +11,7 @@ namespace nsK2EngineLow {
 		SpotLight spLight;
 
 		Vector3 eyePos;		//視点の位置。
-		float pad0;
+		float specPow;
 		Vector3 ambientLight;
 		float pad1;
 
@@ -36,6 +36,11 @@ namespace nsK2EngineLow {
 		void SetAmbient(float x, float y, float z)
 		{
 			SetAmbient({ x,y,z });
+		}
+		//スペキュラの絞り設定。
+		void SetSpecPow(float spec)
+		{
+			specPow = spec;
 		}
 		//地面色設定。
 		void SetGroundColor(const Vector3& color)

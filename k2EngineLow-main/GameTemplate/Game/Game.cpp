@@ -20,9 +20,10 @@ bool Game::Start()
 	InitAmbLight();
 	//InitSpotLight();
 	
-	light.SetGroundColor(0.7f, 0.5f, 0.3f);
-	light.SetSkyColor(0.15f, 0.7f, 0.95f);
-	light.SetGroundNormal(0.0f, 1.0f, 0.0f);
+	//light.SetGroundColor(0.7f, 0.5f, 0.3f);
+	//light.SetSkyColor(0.15f, 0.7f, 0.95f);
+	//light.SetGroundNormal(0.3f, 0.3f, 0.3f);
+	//light.SetSpecPow(5.0f);
 	
 	InitModel(bgModel, charaModel, lightModel, light);
 
@@ -36,13 +37,44 @@ void Game::Update()
 {
 	auto& renderContext = g_graphicsEngine->GetRenderContext();
 	
-	Vector3 dir = directionLight.GetDiretion();
+	/*Vector3 dir = directionLight.GetDiretion();
 
 	Quaternion qRotY;
 	qRotY.SetRotation(g_vec3AxisY, g_pad[0]->GetLStickXF() * 0.02);
 	qRotY.Apply(dir);
 
-	directionLight.SetDirection(dir);
+	directionLight.SetDirection(dir);*/
+
+	Quaternion qRot;
+	if (g_pad[0]->IsPress(enButtonRight))
+	{
+		qRot.SetRotationDegY(1.0f);
+	}
+	else if (g_pad[0]->IsPress(enButtonLeft))
+	{
+		qRot.SetRotationDegY(-1.0f);
+	}
+
+	//qRot.Apply(light.direction);
+	
+
+	// カメラも回す
+	qRot.SetRotationDegY(g_pad[0]->GetLStickXF());
+	auto camPos = g_camera3D->GetPosition();
+	qRot.Apply(camPos);
+	g_camera3D->SetPosition(camPos);
+
+	Vector3 rotAxis;
+	auto toPos = g_camera3D->GetPosition() - g_camera3D->GetTarget();
+	auto dir = toPos;
+	dir.Normalize();
+	rotAxis.Cross(dir, g_vec3AxisY);
+	qRot.SetRotationDeg(rotAxis, g_pad[0]->GetLStickYF());
+	qRot.Apply(toPos);
+	g_camera3D->SetPosition(g_camera3D->GetTarget() + toPos);
+
+	light.SetEyePos(g_camera3D->GetPosition());
+	//light.eyePos = g_camera3D->GetPosition();
 
 	//SpotLight();
 	light.SetLight(directionLight, pointLight, spotLight);
@@ -58,6 +90,7 @@ void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Ligh
 
 	// 使用するシェーダーファイルパスを設定する
 	bgModelInitData.m_fxFilePath = "Assets/shader/model.fx";
+	//bgModelInitData.m_fxFilePath = "Assets/shader/sample.fx";
 
 	// ディレクションライトの情報をディスクリプタヒープに
 	// 定数バッファとして登録するためにモデルの初期化情報として渡す
@@ -72,6 +105,7 @@ void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Ligh
 
 	// 使用するシェーダーファイルパスを設定する
 	unityModelInitData.m_fxFilePath = "Assets/shader/model.fx";
+	//unityModelInitData.m_fxFilePath = "Assets/shader/sample.fx";
 
 	// ディレクションライトの情報をディスクリプタヒープに
 	// 定数バッファとして登録するためモデルの初期化情報として渡す
@@ -102,7 +136,7 @@ void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Ligh
 void Game::InitDirLight()
 {
 	directionLight.SetDirection(0.0f, 0.0f, 1.0f);
-	directionLight.NormalizeDirection();
+	//directionLight.NormalizeDirection();
 	directionLight.SetColor(0.5f, 0.5f, 0.5f);
 
 	light.SetEyePos(g_camera3D->GetPosition());
