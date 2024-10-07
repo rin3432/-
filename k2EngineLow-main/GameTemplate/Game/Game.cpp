@@ -29,6 +29,10 @@ bool Game::Start()
 	
 	InitModel(bgModel, charaModel, lightModel, light);
 
+	
+
+	
+
 	shadow->Start();
 
 	return true;
@@ -88,47 +92,71 @@ void Game::Update()
 
 	shadow->UpdateShadow();
 
-	//bgModel.Draw(renderContext);
+	RenderTarget* rtArray[] = { &offscreenRenderTarget };
+	renderContext.WaitUntilToPossibleSetRenderTargets(1, rtArray);
+	renderContext.SetRenderTargets(1, rtArray);
+	renderContext.ClearRenderTargetViews(1, rtArray);
+
+	bgModel.Draw(renderContext);
 	charaModel.Draw(renderContext);
 	//lightModel.Draw(renderContext);
+
+	renderContext.WaitUntilFinishDrawingToRenderTargets(1, rtArray);
+
+	renderContext.SetRenderTarget(
+		g_graphicsEngine->GetCurrentFrameBuffuerRTV(),
+		g_graphicsEngine->GetCurrentFrameBuffuerDSV()
+	);
+
+	bgModel.Draw(renderContext);
+	charaModel.Draw(renderContext);
+	boxModel.Draw(renderContext);
 }
 
 void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Light& light)
 {
+	offscreenRenderTarget.Create(
+		1280,
+		720,
+		1,
+		1,
+		DXGI_FORMAT_R8G8B8A8_UNORM,
+		DXGI_FORMAT_D32_FLOAT
+	);
+
+	ModelInitData boxModelInitData;
+	boxModelInitData.m_tkmFilePath = "Assets/modelData/box.tkm";
+	boxModelInitData.m_fxFilePath = "Assets/shader/offscreenRender.fx";
+	
+	boxModel.Init(boxModelInitData);
+	boxModel.UpdateWorldMatrix({ 100.0f,0.0f,0.0f }, g_quatIdentity, g_vec3One);
+
+
 	ModelInitData bgModelInitData;
 	bgModelInitData.m_tkmFilePath = "Assets/modelData/flat.tkm";
-
-	// 使用するシェーダーファイルパスを設定する
 	bgModelInitData.m_fxFilePath = "Assets/shader/model.fx";
 	//bgModelInitData.m_fxFilePath = "Assets/shader/sample.fx";
-
-	// ディレクションライトの情報をディスクリプタヒープに
-	// 定数バッファとして登録するためにモデルの初期化情報として渡す
 	bgModelInitData.m_expandConstantBuffer = &light;
 	bgModelInitData.m_expandConstantBufferSize = sizeof(light);
-
-	// 初期化情報を使ってモデルを初期化する
 	bgModel.Init(bgModelInitData);
 
 	ModelInitData unityModelInitData;
 	unityModelInitData.m_tkmFilePath = "Assets/modelData/unityChan.tkm";
-
-	// 使用するシェーダーファイルパスを設定する
 	unityModelInitData.m_fxFilePath = "Assets/shader/model.fx";
 	//unityModelInitData.m_fxFilePath = "Assets/shader/sample.fx";
-
-	// ディレクションライトの情報をディスクリプタヒープに
-	// 定数バッファとして登録するためモデルの初期化情報として渡す
 	unityModelInitData.m_expandConstantBuffer = &light;
 	unityModelInitData.m_expandConstantBufferSize = sizeof(light);
-
-	// 初期化情報を使ってモデルを初期化する
 	teapotModel.Init(unityModelInitData);
 
 	teapotModel.UpdateWorldMatrix(
 		{ 0.0f, 20.0f, 0.0f },
 		g_quatIdentity,
 		g_vec3One
+	);
+
+	boxModel.ChangeAlbedoMap(
+		"",
+		offscreenRenderTarget.GetRenderTargetTexture()
 	);
 
 	ModelInitData lightModelInitData;

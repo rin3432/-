@@ -21,22 +21,22 @@ cbuffer ModelCb : register(b0)
 // 頂点シェーダーへの入力
 struct SVSIn
 {
-    float4 pos : POSITION; //モデルの頂点座標
-    float3 normal : NORMAL; //法線
-    float3 tangent : TANGENT;
+    float4 pos : POSITION;      //モデルの頂点座標
+    float3 normal : NORMAL;     //法線
+    float3 tangent  : TANGENT;
     float3 biNormal : BINORMAL;
-    float2 uv : TEXCOORD0; //UV座標
+    float2 uv : TEXCOORD0;      //UV座標
 };
 
 // ピクセルシェーダーへの入力
 struct SPSIn
 {
-    float4 pos : SV_POSITION; //スクリーン空間でのピクセルの座標
-    float3 normal : NORMAL; //法線
+    float4 pos : SV_POSITION;       //スクリーン空間でのピクセルの座標
+    float3 normal : NORMAL;         //法線
     float3 tangent : TANGENT;
     float3 biNormal : BINORMAL;
-    float2 uv : TEXCOORD0; //uv座標
-    float3 worldPos : TEXCOORD1; //ワールド空間でのピクセルの座標
+    float2 uv : TEXCOORD0;          //uv座標
+    float3 worldPos : TEXCOORD1;    //ワールド空間でのピクセルの座標
 };
 
 ///////////////////////////////////////////////////
@@ -67,9 +67,7 @@ SPSIn VSMain(SVSIn vsIn)
     return psIn;
 }
 
-/// <summary>
-/// ピクセルシェーダー
-/// </summary>
+//ピクセルシェーダー
 float4 PSMain(SPSIn psIn) : SV_Target0
 {
     return g_albedo.Sample(g_sampler, psIn.uv);

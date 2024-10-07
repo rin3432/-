@@ -9,9 +9,12 @@ private:
 	SpotLight spotLight;
 
 	Model lightModel, bgModel, charaModel;
+	Model boxModel;
 	Shadow* shadow;
+	RenderTarget offscreenRenderTarget;
 
-	
+	Vector3 plPos;
+
 public:
 	Game();
 	~Game();
