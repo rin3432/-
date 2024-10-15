@@ -2,6 +2,14 @@
 #include "Game.h"
 #include "Shadow.h"
 
+const int NUM_WEIGHTS = 8;
+/// <summary>
+/// ブラー用のパラメーター
+/// </summary>
+struct SBlurParam
+{
+	float weights[NUM_WEIGHTS];
+};
 
 Game::Game()
 {
@@ -97,30 +105,64 @@ void Game::Update()
 	renderContext.SetRenderTargets(1, rtArray);
 	renderContext.ClearRenderTargetViews(1, rtArray);
 
-	bgModel.Draw(renderContext);
+	//bgModel.Draw(renderContext);
 	charaModel.Draw(renderContext);
 	//lightModel.Draw(renderContext);
 
 	renderContext.WaitUntilFinishDrawingToRenderTargets(1, rtArray);
 
+	renderContext.WaitUntilToPossibleSetRenderTarget(mainRenderTarget);
+	renderContext.SetRenderTargetAndViewport(mainRenderTarget);
+	renderContext.ClearRenderTargetView(mainRenderTarget);
+
+	charaModel.Draw(renderContext);
+	renderContext.WaitUntilFinishDrawingToRenderTarget(mainRenderTarget);
+
+	renderContext.WaitUntilToPossibleSetRenderTarget(luminnceRenderTarget);
+	renderContext.SetRenderTargetAndViewport(luminnceRenderTarget);
+	renderContext.ClearRenderTargetView(luminnceRenderTarget);
+	luminanceSprite.Draw(renderContext);
+	renderContext.WaitUntilFinishDrawingToRenderTarget(luminnceRenderTarget);
+
+	gaussianBlur.ExecuteOnGPU(renderContext, 20);
+
+	renderContext.WaitUntilToPossibleSetRenderTarget(mainRenderTarget);
+	renderContext.SetRenderTargetAndViewport(mainRenderTarget);
+	finalSprite.Draw(renderContext);
+	renderContext.WaitUntilFinishDrawingToRenderTarget(mainRenderTarget);
+
 	renderContext.SetRenderTarget(
 		g_graphicsEngine->GetCurrentFrameBuffuerRTV(),
 		g_graphicsEngine->GetCurrentFrameBuffuerDSV()
 	);
+	copyToFrameBufferSprite.Draw(renderContext);
 
-	bgModel.Draw(renderContext);
+	//bgModel.Draw(renderContext);
 	charaModel.Draw(renderContext);
 	boxModel.Draw(renderContext);
 }
 
 void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Light& light)
 {
+
+	RootSignature rs;
+	InitRootSignature(rs);
+
 	offscreenRenderTarget.Create(
 		1280,
 		720,
 		1,
 		1,
-		DXGI_FORMAT_R8G8B8A8_UNORM,
+		DXGI_FORMAT_R32G32B32A32_FLOAT,
+		DXGI_FORMAT_D32_FLOAT
+	);
+
+	mainRenderTarget.Create(
+		1280,
+		720,
+		1,
+		1,
+		DXGI_FORMAT_R32G32B32A32_FLOAT,
 		DXGI_FORMAT_D32_FLOAT
 	);
 
@@ -142,10 +184,12 @@ void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Ligh
 
 	ModelInitData unityModelInitData;
 	unityModelInitData.m_tkmFilePath = "Assets/modelData/unityChan.tkm";
-	unityModelInitData.m_fxFilePath = "Assets/shader/model.fx";
+	unityModelInitData.m_fxFilePath = "Assets/shader/Bloom.fx";
 	//unityModelInitData.m_fxFilePath = "Assets/shader/sample.fx";
 	unityModelInitData.m_expandConstantBuffer = &light;
 	unityModelInitData.m_expandConstantBufferSize = sizeof(light);
+	unityModelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+
 	teapotModel.Init(unityModelInitData);
 
 	teapotModel.UpdateWorldMatrix(
@@ -158,6 +202,51 @@ void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Ligh
 		"",
 		offscreenRenderTarget.GetRenderTargetTexture()
 	);
+
+	
+	luminnceRenderTarget.Create(
+		1280,
+		720,
+		1,
+		1,
+		DXGI_FORMAT_R32G32B32A32_FLOAT,
+		DXGI_FORMAT_D32_FLOAT
+	);
+
+	SpriteInitData luminanceSpriteInitData;
+	luminanceSpriteInitData.m_fxFilePath = "Assets/shader/samplePostEffect.fx";
+	luminanceSpriteInitData.m_vsEntryPointFunc = "VSMain";
+	luminanceSpriteInitData.m_psEntryPoinFunc = "PSSamplingLuminance";
+	luminanceSpriteInitData.m_width = 1280;
+	luminanceSpriteInitData.m_height = 720;
+	luminanceSpriteInitData.m_textures[0] = &mainRenderTarget.GetRenderTargetTexture();
+	luminanceSpriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32_FLOAT;
+
+	
+	luminanceSprite.Init(luminanceSpriteInitData);
+
+	
+	gaussianBlur.Init(&luminnceRenderTarget.GetRenderTargetTexture());
+	
+	SpriteInitData finalSpriteInitData;
+	finalSpriteInitData.m_textures[0] = &gaussianBlur.GetBokeTexture();
+	finalSpriteInitData.m_width = 1280;
+	finalSpriteInitData.m_height = 720;
+	finalSpriteInitData.m_fxFilePath = "Assets/shader/sample2D.fx";
+	finalSpriteInitData.m_alphaBlendMode = AlphaBlendMode_Add;
+	finalSpriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+	
+	finalSprite.Init(finalSpriteInitData);
+
+	SpriteInitData spriteInitData;
+	spriteInitData.m_textures[0] = &mainRenderTarget.GetRenderTargetTexture();
+	spriteInitData.m_width = 1280;
+	spriteInitData.m_height = 720;
+	spriteInitData.m_fxFilePath = "Assets/shader/sample2D.fx";
+	
+	copyToFrameBufferSprite.Init(spriteInitData);
+
 
 	ModelInitData lightModelInitData;
 	lightModelInitData.m_tkmFilePath = "Assets/modelData/light.tkm";
@@ -173,9 +262,9 @@ void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Ligh
 
 void Game::InitDirLight()
 {
-	directionLight.SetDirection(0.0f, -1.0f, 0.0f);
+	directionLight.SetDirection(1.0f, 0.0f, 0.0f);
 	//directionLight.NormalizeDirection();
-	directionLight.SetColor(0.5f, 0.5f, 0.5f);
+	directionLight.SetColor(20.8f, 20.8f, 20.8f);
 
 	light.SetEyePos(g_camera3D->GetPosition());
 }
@@ -237,3 +326,10 @@ void Game::SpotLight()
 	lightModel.UpdateWorldMatrix(spotLight.GetPosition(), qRot, g_vec3One);
 }
 
+void Game::InitRootSignature(RootSignature& rs)
+{
+	rs.Init(D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP);
+}

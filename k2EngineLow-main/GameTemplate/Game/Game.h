@@ -12,6 +12,13 @@ private:
 	Model boxModel;
 	Shadow* shadow;
 	RenderTarget offscreenRenderTarget;
+	RenderTarget mainRenderTarget;
+	RenderTarget luminnceRenderTarget;
+	Sprite luminanceSprite;
+	GaussianBlur gaussianBlur;
+	Sprite finalSprite;
+	Sprite copyToFrameBufferSprite;
+
 
 	Vector3 plPos;
 
@@ -29,6 +36,7 @@ public:
 	void InitSpotLight();
 
 	void SpotLight();
+	void InitRootSignature(RootSignature& rs);
 
 	void SetLight(Vector3 pos)
 	{

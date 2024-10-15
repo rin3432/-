@@ -112,6 +112,3 @@ static const int MAX_BONE = 512;	// ƒ{[ƒ“‚ÌÅ‘å”B
 
 //‚±‚±‚©‚ç’Ç‰Á
 #include "Light.h"
-#include "DirectionLight.h"
-#include "PointLight.h"
-#include "SpotLight.h"
