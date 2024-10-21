@@ -1,8 +1,17 @@
 #pragma once
+
+class Player;
+class GameCamera;
+class BackGround;
 class Shadow;
 class Game : public IGameObject
 {
 private:
+	Player* player;
+	Shadow* shadow;
+	GameCamera* gameCamera;
+	BackGround* backGround;
+
 	Light light;
 	DirectionalLight directionLight;
 	PointLight pointLight;
@@ -10,7 +19,6 @@ private:
 
 	Model lightModel, bgModel, charaModel;
 	Model boxModel;
-	Shadow* shadow;
 	RenderTarget offscreenRenderTarget;
 	RenderTarget mainRenderTarget;
 	RenderTarget luminnceRenderTarget;
@@ -42,5 +50,6 @@ public:
 	{
 		light.SetEyePos(pos);
 	}
+	
 };
 

@@ -62,7 +62,7 @@ cbuffer DirectionLightCb : register(b1)
     float3 groundNormal;
 }
 
-sampler g_sampler : register(s0); //サンプラステート。
+sampler g_sampler : register(s0);
 
 Texture2D<float4> g_texture : register(t0);
 Texture2D<float4> g_normalMap : register(t1);
@@ -93,7 +93,7 @@ float4 PSMain(SPSIn psIn) : SV_Target0
     
     localNormal = (localNormal - 0.5f) * 2.0f;
     normal = psIn.tangent * localNormal.x + psIn.biNormal * localNormal.y + normal * localNormal.z;
-    // 拡散反射光を計算する
+
     float3 lig = 0.0f;
     lig += max(0.0f, dot(normal, -dirDirection)) * dirColor;
     lig += ambientLight;
