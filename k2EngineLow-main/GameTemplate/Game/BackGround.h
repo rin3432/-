@@ -3,6 +3,7 @@ class BackGround : public IGameObject
 {
 private:
 	Model m_model;
+	PhysicsStaticObject m_physicsStaticObject;
 
 public:
 	bool Start();

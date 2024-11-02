@@ -15,6 +15,7 @@ Player::~Player()
 bool Player::Start()
 {
 	gameCamera = FindGO<GameCamera>("gameCamera");
+	m_charaCon.Init(25.0f, 75.0f, m_position);
 
 	return true;
 }
@@ -30,7 +31,7 @@ void Player::Update()
 
 	m_model.Init(unityModelInitData);
 	m_model.UpdateWorldMatrix(
-		m_position,
+		m_charaCon.GetPosition(),
 		m_rotation,
 		g_vec3One
 	);
@@ -40,7 +41,7 @@ void Player::Update()
 
 void Player::Render(RenderContext& rc)
 {
-
+	
 }
 
 void Player::Init(Light& light)
@@ -87,12 +88,31 @@ void Player::Move()
 	{
 		m_moveSpeed.y = 300.0f;
 	}
+	if (g_pad[0]->IsPress(enButtonB))
+	{
+		m_moveSpeed.y = 0.0f;
+	}
+	if (g_pad[0]->IsPress(enButtonY))
+	{
+		m_moveSpeed.y = -300.0f;
+	}
 	if (g_pad[0]->IsPress(enButtonX))
 	{
 		m_moveSpeed = (right + forward) * 7.5;
 	}
 
-	m_position += m_moveSpeed / 10.0f;//移動速度。
+	//重力。
+	if (m_charaCon.IsOnGround())
+	{
+		//m_moveSpeed.y = 0.0f;
+	}
+	else
+	{
+		m_moveSpeed.y -= 10.0f;
+	}
+
+	//m_position += m_moveSpeed / 10.0f;//移動速度。
+	m_charaCon.Execute(m_moveSpeed, 1.0f / 20.0f);
 }
 
 void Player::Rotation()

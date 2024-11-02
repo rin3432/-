@@ -9,8 +9,11 @@ private:
 
 	Quaternion m_rotation;
 
+	CharacterController m_charaCon;
+
 	ModelInitData unityModelInitData;
 	Model m_model;
+
 
 	Light m_light;
 	GameCamera* gameCamera;
@@ -27,7 +30,7 @@ public:
 
 	const Vector3& GetPos() const
 	{
-		return m_position;
+		return m_charaCon.GetPosition();
 	}
 };
 
