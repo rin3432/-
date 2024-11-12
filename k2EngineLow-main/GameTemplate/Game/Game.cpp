@@ -27,7 +27,7 @@ Game::~Game()
 bool Game::Start()
 {
 	player = NewGO<Player>(0, "player");
-	gameCamera = NewGO<GameCamera>(0, "gameCmera");
+	gameCamera = NewGO<GameCamera>(0, "gameCamera");
 	backGround = NewGO<BackGround>(0, "backGround");
 	shadow = NewGO<Shadow>(0,"shadow");
 

@@ -88,14 +88,14 @@ void Player::Move()
 	{
 		m_moveSpeed.y = 300.0f;
 	}
-	if (g_pad[0]->IsPress(enButtonB))
+	/*if (g_pad[0]->IsPress(enButtonB))
 	{
 		m_moveSpeed.y = 0.0f;
 	}
 	if (g_pad[0]->IsPress(enButtonY))
 	{
 		m_moveSpeed.y = -300.0f;
-	}
+	}*/
 	if (g_pad[0]->IsPress(enButtonX))
 	{
 		m_moveSpeed = (right + forward) * 7.5;
@@ -117,5 +117,6 @@ void Player::Move()
 
 void Player::Rotation()
 {
-	//m_rotation.SetRotationYFromDirectionXZ(gameCamera->GetToCameraPos());
+	Vector3 a = gameCamera->GetToCameraPos();
+	//m_rotation.SetRotationYFromDirectionXZ(a);
 }
