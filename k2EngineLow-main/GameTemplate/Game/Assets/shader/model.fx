@@ -83,6 +83,8 @@ sampler g_sampler : register(s0);	//サンプラステート。
 Texture2D<float4> g_texture : register(t0);
 Texture2D<float4> g_normalMap : register(t1);
 Texture2D<float4> g_specularMap : register(t2);
+StructuredBuffer<float4x4> g_boneMatrix : register(t3);	//ボーン行列。
+
 Texture2D<float4> g_aoMap : register(t10);
 ////////////////////////////////////////////////
 // 関数定義。
@@ -92,46 +94,51 @@ Texture2D<float4> g_aoMap : register(t10);
 /// <summary>
 //スキン行列を計算する。
 /// </summary>
-//float4x4 CalcSkinMatrix(SSkinVSIn skinVert)
-//{
-//    float4x4 skinning = 0;
-//    float w = 0.0f;
-//	[unroll]
-//    for (int i = 0; i < 3; i++)
-//    {
-//        skinning += g_boneMatrix[skinVert.Indices[i]] * skinVert.Weights[i];
-//        w += skinVert.Weights[i];
-//    }
+float4x4 CalcSkinMatrix(SSkinVSIn skinVert)
+{
+    float4x4 skinning = 0;
+    float w = 0.0f;
+	[unroll]
+    for (int i = 0; i < 3; i++)
+    {
+       skinning += g_boneMatrix[skinVert.Indices[i]] * skinVert.Weights[i];
+       w += skinVert.Weights[i];
+    }
     
-//    skinning += g_boneMatrix[skinVert.Indices[3]] * (1.0f - w);
+    skinning += g_boneMatrix[skinVert.Indices[3]] * (1.0f - w);
 	
-//    return skinning;
-//}
+    return skinning;
+}
 
 /// <summary>
 /// 頂点シェーダーのコア関数。
 /// </summary>
-//SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
-//{
-//    SPSIn psIn;
-//    float4x4 m;
-//    if (hasSkin)
-//    {
-//        m = CalcSkinMatrix(vsIn.skinVert);
-//    }
-//    else
-//    {
-//        m = mWorld;
-//    }
-//    psIn.pos = mul(m, vsIn.pos);
-//    psIn.pos = mul(mView, psIn.pos);
-//    psIn.pos = mul(mProj, psIn.pos);
+SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
+{
+    SPSIn psIn;
+    float4x4 m;
+    if (hasSkin)
+    {
+        m = CalcSkinMatrix(vsIn.skinVert);
+    }
+    else
+    {
+        m = mWorld;
+    }
 
-//    psIn.normal = mul(mWorld, vsIn.normal);
-//    psIn.uv = vsIn.uv;
+    psIn.pos = mul(m, vsIn.pos);
+    psIn.worldPos = psIn.pos;
+    psIn.pos = mul(mView, psIn.pos);
+    psIn.pos = mul(mProj, psIn.pos);
+    psIn.normal = normalize(mul(mWorld, vsIn.normal));
 
-//    return psIn;
-//}
+    psIn.tangent = normalize(mul(mWorld, vsIn.tangent));
+    psIn.biNormal = normalize(mul(mWorld, vsIn.biNormal));
+    psIn.normalInView = mul(mView, psIn.normal);
+
+    psIn.uv = vsIn.uv;
+    return psIn;
+}
 
 /// <summary>
 /// スキンなしメッシュ用の頂点シェーダーのエントリー関数。
@@ -155,10 +162,10 @@ SPSIn VSMain(SVSIn vsIn)
 /// <summary>
 /// スキンありメッシュの頂点シェーダーのエントリー関数。
 /// </summary>
-//SPSIn VSSkinMain(SVSIn vsIn)
-//{
-//    return VSMainCore(vsIn, true);
-//}
+SPSIn VSSkinMain(SVSIn vsIn)
+{
+    return VSMainCore(vsIn, true);
+}
 
 //float4 PSMain(SPSIn psIn) : SV_Target0
 //{

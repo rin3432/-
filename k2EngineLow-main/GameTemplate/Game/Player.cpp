@@ -20,6 +20,26 @@ bool Player::Start()
 	return true;
 }
 
+void Player::InitAnimation()
+{
+	m_skeleton.Init("Assets/modelData/unityChan.tks");
+
+	m_animationClipArray[enAnimClip_Idle].Load("Assets/animData/idle.tka");
+	m_animationClipArray[enAnimClip_Idle].SetLoopFlag(true);
+	m_animationClipArray[enAnimClip_Run].Load("Assets/animData/run.tka");
+	m_animationClipArray[enAnimClip_Run].SetLoopFlag(true);
+	m_animationClipArray[enAnimClip_Walk].Load("Assets/animData/walk.tka");
+	m_animationClipArray[enAnimClip_Walk].SetLoopFlag(true);
+	m_animationClipArray[enAnimClip_Jump].Load("Assets/animData/jump.tka");
+	m_animationClipArray[enAnimClip_Jump].SetLoopFlag(false);
+
+	m_animation.Init(
+		m_skeleton,
+		m_animationClipArray,
+		enAnimClip_Num
+	);
+}
+
 void Player::Update()
 {
 	auto& renderContext = g_graphicsEngine->GetRenderContext();
@@ -29,7 +49,7 @@ void Player::Update()
 	Move();
 	Rotation();
 
-	m_model.Init(unityModelInitData);
+	//m_model.Init(unityModelInitData);
 	m_model.UpdateWorldMatrix(
 		m_charaCon.GetPosition(),
 		m_rotation,
@@ -41,16 +61,17 @@ void Player::Update()
 
 void Player::Render(RenderContext& rc)
 {
-	
+	m_model.Draw(rc);
 }
 
 void Player::Init(Light& light)
 {
 	m_position = { 0.0f, 20.0f, 0.0f };
 
-	unityModelInitData.m_tkmFilePath = "Assets/modelData/unityChan.tkm";
+	unityModelInitData.m_tkmFilePath = "Assets/modelData/player.tkm";
 	unityModelInitData.m_fxFilePath = "Assets/shader/map/SpecularMap.fx";
 	//unityModelInitData.m_fxFilePath = "Assets/shader/Bloom.fx";
+	//unityModelInitData.m_skeleton = &m_skeleton;
 	unityModelInitData.m_expandConstantBuffer = &light;
 	unityModelInitData.m_expandConstantBufferSize = sizeof(light);
 	unityModelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -117,6 +138,10 @@ void Player::Move()
 
 void Player::Rotation()
 {
-	Vector3 a = gameCamera->GetToCameraPos();
-	//m_rotation.SetRotationYFromDirectionXZ(a);
+	m_rotation.SetRotationYFromDirectionXZ(gameCamera->GetToCameraPos());
+}
+
+void Player::Animation()
+{
+
 }
