@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "GameCamera.h"
+#include "Bullet.h"
 
 Player::Player()
 {
@@ -15,6 +16,7 @@ Player::~Player()
 bool Player::Start()
 {
 	gameCamera = FindGO<GameCamera>("gameCamera");
+	bullet = FindGO<Bullet>("bullet");
 	m_charaCon.Init(25.0f, 75.0f, m_position);
 
 	return true;
@@ -22,13 +24,13 @@ bool Player::Start()
 
 void Player::InitAnimation()
 {
-	m_skeleton.Init("Assets/modelData/unityChan.tks");
+	m_skeleton.Init("Assets/modelData/player.tks");
 
-	m_animationClipArray[enAnimClip_Idle].Load("Assets/animData/idle.tka");
+	m_animationClipArray[enAnimClip_Idle].Load("Assets/animData/idle2.tka");
 	m_animationClipArray[enAnimClip_Idle].SetLoopFlag(true);
-	m_animationClipArray[enAnimClip_Run].Load("Assets/animData/run.tka");
+	m_animationClipArray[enAnimClip_Run].Load("Assets/animData/playerRun2.tka");
 	m_animationClipArray[enAnimClip_Run].SetLoopFlag(true);
-	m_animationClipArray[enAnimClip_Walk].Load("Assets/animData/walk.tka");
+	m_animationClipArray[enAnimClip_Walk].Load("Assets/animData/playerWalk.tka");
 	m_animationClipArray[enAnimClip_Walk].SetLoopFlag(true);
 	m_animationClipArray[enAnimClip_Jump].Load("Assets/animData/jump.tka");
 	m_animationClipArray[enAnimClip_Jump].SetLoopFlag(false);
@@ -48,13 +50,20 @@ void Player::Update()
 
 	Move();
 	Rotation();
+	Animation();
+
 
 	//m_model.Init(unityModelInitData);
+	
+	m_animation.Progress(g_gameTime->GetFrameDeltaTime());
+
 	m_model.UpdateWorldMatrix(
 		m_charaCon.GetPosition(),
 		m_rotation,
 		g_vec3One
 	);
+
+	m_skeleton.Update(m_model.GetWorldMatrix());
 
 	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 }
@@ -68,20 +77,19 @@ void Player::Init(Light& light)
 {
 	m_position = { 0.0f, 20.0f, 0.0f };
 
+	InitAnimation();
+
 	unityModelInitData.m_tkmFilePath = "Assets/modelData/player.tkm";
-	unityModelInitData.m_fxFilePath = "Assets/shader/map/SpecularMap.fx";
+	unityModelInitData.m_fxFilePath = "Assets/shader/model.fx";
 	//unityModelInitData.m_fxFilePath = "Assets/shader/Bloom.fx";
-	//unityModelInitData.m_skeleton = &m_skeleton;
+	unityModelInitData.m_vsEntryPointFunc = "VSMain";
+	unityModelInitData.m_vsSkinEntryPointFunc = "VSSkinMain";
+	unityModelInitData.m_skeleton = &m_skeleton;
 	unityModelInitData.m_expandConstantBuffer = &light;
 	unityModelInitData.m_expandConstantBufferSize = sizeof(light);
 	unityModelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
 
 	m_model.Init(unityModelInitData);
-	m_model.UpdateWorldMatrix(
-		m_position,
-		g_quatIdentity,
-		g_vec3One
-	);
 }
 
 void Player::Move()
@@ -109,11 +117,11 @@ void Player::Move()
 	{
 		m_moveSpeed.y = 300.0f;
 	}
-	/*if (g_pad[0]->IsPress(enButtonB))
+	if (g_pad[0]->IsPress(enButtonB))
 	{
-		m_moveSpeed.y = 0.0f;
+		bullet->OnFlag();
 	}
-	if (g_pad[0]->IsPress(enButtonY))
+	/*if (g_pad[0]->IsPress(enButtonY))
 	{
 		m_moveSpeed.y = -300.0f;
 	}*/
@@ -139,9 +147,10 @@ void Player::Move()
 void Player::Rotation()
 {
 	m_rotation.SetRotationYFromDirectionXZ(gameCamera->GetToCameraPos());
+	//m_rotation.AddRotationDegX(180.0f);
 }
 
 void Player::Animation()
 {
-
+	m_animation.Play(enAnimClip_Walk, 0.2f);
 }

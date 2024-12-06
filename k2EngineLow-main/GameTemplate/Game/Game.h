@@ -4,6 +4,7 @@ class Player;
 class GameCamera;
 class BackGround;
 class Shadow;
+class Bullet;
 class Game : public IGameObject
 {
 private:
@@ -11,6 +12,7 @@ private:
 	Shadow* shadow;
 	GameCamera* gameCamera;
 	BackGround* backGround;
+	Bullet* bullet;
 
 	Light light;
 	DirectionalLight directionLight;

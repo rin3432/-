@@ -4,6 +4,7 @@
 #include "GameCamera.h"
 #include "BackGround.h"
 #include "Shadow.h"
+#include "Bullet.h"
 
 const int NUM_WEIGHTS = 8;
 /// <summary>
@@ -30,6 +31,7 @@ bool Game::Start()
 	gameCamera = NewGO<GameCamera>(0, "gameCamera");
 	backGround = NewGO<BackGround>(0, "backGround");
 	shadow = NewGO<Shadow>(0,"shadow");
+	bullet = NewGO<Bullet>(0, "bullet");
 
 	InitDirLight();
 	//InitPtLight();

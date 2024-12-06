@@ -1,6 +1,7 @@
 #pragma once
 
 class GameCamera;
+class Bullet;
 class Player :public IGameObject
 {
 private:
@@ -36,6 +37,7 @@ private:
 
 	Light m_light;
 	GameCamera* gameCamera;
+	Bullet* bullet;
 	
 public:
 	Player();
@@ -52,6 +54,10 @@ public:
 	const Vector3& GetPos() const
 	{
 		return m_charaCon.GetPosition();
+	}
+	const Quaternion& GetRot() const
+	{
+		return m_rotation;
 	}
 };
 
