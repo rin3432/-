@@ -74,13 +74,17 @@ void Bullet::InitPos()
 
 void Bullet::InitRot()
 {
-    m_rotation = player->GetRot();
-    m_rotation.Apply(m_velocity);
+    Vector3 hitPos = gameCamera->GetHitPos();
+    Vector3 hitRot = hitPos - initPos;
+    m_velocity = hitRot;
+    m_velocity.Normalize();
+    //m_rotation.Apply(hitRot);
+    /*m_rotation.Apply(gameCamera->GetHitPos());*/
 }
 
 void Bullet::Move()
 {
-    m_position += m_velocity * g_gameTime->GetFrameDeltaTime();
+    m_position += m_velocity * 800.0f * g_gameTime->GetFrameDeltaTime();
 }
 
 void Bullet::Rotation()

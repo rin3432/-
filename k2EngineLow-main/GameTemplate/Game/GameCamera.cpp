@@ -26,13 +26,22 @@ bool GameCamera::Start()
 	g_camera3D->SetFar(10000.0f);
 
 
+	ModelInitData bgModelInitData;
+	bgModelInitData.m_tkmFilePath = "Assets/modelData/model.tkm";
+	//bgModelInitData.m_fxFilePath = "Assets/shader/map/SpecularMap.fx";
+	bgModelInitData.m_fxFilePath = "Assets/shader/sample.fx";
+
+	m_model.Init(bgModelInitData);
+
+	
+
 	return true;
 }
 
 void GameCamera::Update()
 {
 	m_target = m_player->GetPos();
-	m_target.y += 100.0f;
+	m_target.y += 200.0f;
 	Vector3 toCameraPosOld = m_toCameraPos;
 
 	float x = g_pad[0]->GetRStickXF();
@@ -60,4 +69,24 @@ void GameCamera::Update()
 	m_target = m_target - m_toCameraPos;
 	g_camera3D->SetTarget(m_position);
 	g_camera3D->SetPosition(m_target);
+
+	m_endForwardPos = m_position + g_camera3D->GetForward() * 10000.0f;
+
+	if (PhysicsWorld::GetInstance()->RayTest(m_position, m_endForwardPos, m_hitPos)) {
+		// è’ìÀÇµÇƒÇ¢ÇÈ
+		m_model.UpdateWorldMatrix(
+			m_hitPos,
+			m_rot,
+			g_vec3One
+		);
+	}
+
+	
+	
 }
+
+void GameCamera::Render(RenderContext& rc)
+{
+	m_model.Draw(rc);
+}
+

@@ -10,6 +10,13 @@ K2EngineLow* g_k2EngineLow = nullptr;
 /// </summary>
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
+	//Vector3 start, end, hitPos;
+	//// startはカメラの視点
+	//// endはカメラの視点 + GetForward() * 1000.0
+	//if (PhysicsWorld::GetInstance()->RayTest(start, end, hitPos)) {
+	//	// 衝突している
+
+	//}
 	// ゲームの初期化。
 	InitGame(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("Game"));
 
