@@ -2,6 +2,11 @@
 #include "Player.h"
 #include "GameCamera.h"
 #include "Bullet.h"
+#include "Turret.h"
+
+namespace {
+	Vector3 Zero = { 0.0f,0.0f,0.0f };
+}
 
 Player::Player()
 {
@@ -17,6 +22,7 @@ bool Player::Start()
 {
 	gameCamera = FindGO<GameCamera>("gameCamera");
 	bullet = FindGO<Bullet>("bullet");
+	turret = FindGO<Turret>("turret");
 	m_charaCon.Init(25.0f, 75.0f, m_position);
 
 	return true;
@@ -111,6 +117,15 @@ void Player::Move()
 	forward *= stickL.y * 120.0f;
 	
 	m_moveSpeed += right + forward;
+
+	float speed = m_moveSpeed.Length();
+
+	if (speed == 0.0f) {
+		m_status = Idle;
+	}
+	else {
+		m_status = Walk;
+	}
 	
 		//ダッシュとジャンプ
 	if (g_pad[0]->IsPress(enButtonA))
@@ -121,19 +136,20 @@ void Player::Move()
 	{
 		bullet->OnFlag();
 	}
-	/*if (g_pad[0]->IsPress(enButtonY))
+	if (g_pad[0]->IsTrigger(enButtonY))
 	{
-		m_moveSpeed.y = -300.0f;
-	}*/
+		turret->OnFlag();
+	}
 	if (g_pad[0]->IsPress(enButtonX))
 	{
 		m_moveSpeed = (right + forward) * 7.5;
+		m_status = Run;
 	}
 
 	//重力。
 	if (m_charaCon.IsOnGround())
 	{
-		//m_moveSpeed.y = 0.0f;
+		m_moveSpeed.y = 0.0f;
 	}
 	else
 	{
@@ -152,5 +168,27 @@ void Player::Rotation()
 
 void Player::Animation()
 {
-	m_animation.Play(enAnimClip_Walk, 0.2f);
+	//m_animation.Play(enAnimClip_Walk, 0.2f);
+	//m_animation.Play(enAnimClip_Idle, 0.2f);
+	//m_animation.Play(enAnimClip_Run, 0.2f);
+	//m_animation.Play(enAnimClip_Jump, 0.2f);	//無し
+	
+	switch (m_status)
+	{
+	case Player::Idle:
+		m_animation.Play(enAnimClip_Idle, 0.2f);
+		break;
+	case Player::Run:
+		m_animation.Play(enAnimClip_Run, 0.2f);
+		break;
+	case Player::Walk:
+		m_animation.Play(enAnimClip_Walk, 0.2f);
+		break;
+	case Player::Jump:
+		break;
+	case Player::Num:
+		break;
+	default:
+		break;
+	}
 }

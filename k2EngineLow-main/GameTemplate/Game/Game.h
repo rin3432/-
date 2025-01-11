@@ -5,6 +5,8 @@ class GameCamera;
 class BackGround;
 class Shadow;
 class Bullet;
+class Turret;
+class Lever;
 class Game : public IGameObject
 {
 private:
@@ -13,6 +15,8 @@ private:
 	GameCamera* gameCamera;
 	BackGround* backGround;
 	Bullet* bullet;
+	Turret* turret;
+	Lever* level;
 
 	Light light;
 	DirectionalLight directionLight;

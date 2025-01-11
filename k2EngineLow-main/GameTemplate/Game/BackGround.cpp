@@ -10,7 +10,7 @@ void BackGround::Updata()
 {
 	auto& renderContext = g_graphicsEngine->GetRenderContext();
 
-	PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
+	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 
 	m_model.Draw(renderContext);
 }

@@ -78,8 +78,6 @@ void Bullet::InitRot()
     Vector3 hitRot = hitPos - initPos;
     m_velocity = hitRot;
     m_velocity.Normalize();
-    //m_rotation.Apply(hitRot);
-    /*m_rotation.Apply(gameCamera->GetHitPos());*/
 }
 
 void Bullet::Move()

@@ -18,6 +18,8 @@
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Raytracing.cpp" />
+    <ClCompile Include="Turret.cpp" />
+    <ClCompile Include="Lever.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -31,5 +33,7 @@
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Raytracing.h" />
+    <ClInclude Include="Turret.h" />
+    <ClInclude Include="Lever.h" />
   </ItemGroup>
 </Project>

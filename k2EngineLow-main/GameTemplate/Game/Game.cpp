@@ -5,6 +5,8 @@
 #include "BackGround.h"
 #include "Shadow.h"
 #include "Bullet.h"
+#include "Turret.h"
+#include "Lever.h"
 
 const int NUM_WEIGHTS = 8;
 /// <summary>
@@ -32,6 +34,8 @@ bool Game::Start()
 	backGround = NewGO<BackGround>(0, "backGround");
 	shadow = NewGO<Shadow>(0,"shadow");
 	bullet = NewGO<Bullet>(0, "bullet");
+	turret = NewGO<Turret>(0, "turret");
+	level = NewGO<Lever>(0, "level");
 
 	InitDirLight();
 	//InitPtLight();

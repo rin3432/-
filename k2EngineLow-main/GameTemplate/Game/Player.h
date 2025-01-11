@@ -2,6 +2,7 @@
 
 class GameCamera;
 class Bullet;
+class Turret;
 class Player :public IGameObject
 {
 private:
@@ -38,6 +39,9 @@ private:
 	Light m_light;
 	GameCamera* gameCamera;
 	Bullet* bullet;
+	Turret* turret;
+
+	Status m_status = Num;
 	
 public:
 	Player();
