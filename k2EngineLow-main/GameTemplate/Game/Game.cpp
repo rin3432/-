@@ -7,6 +7,9 @@
 #include "Bullet.h"
 #include "Turret.h"
 #include "Lever.h"
+#include "SpriteRender.h"
+#include "Enemy.h"
+#include "NaviMap.h"
 
 const int NUM_WEIGHTS = 8;
 /// <summary>
@@ -36,6 +39,17 @@ bool Game::Start()
 	bullet = NewGO<Bullet>(0, "bullet");
 	turret = NewGO<Turret>(0, "turret");
 	level = NewGO<Lever>(0, "level");
+	spriteRender = NewGO<SpriteRender>(0, "spriteRender");
+	//enemy = NewGO<Enemy>(0, "enemy");
+	naviMap = NewGO<NaviMap>(0, "naviMap");
+
+
+	for (int i = 0;i < 100;i++) {
+		m_enemy[i] = NewGO<Enemy>(0, "enemy");
+	}
+	
+
+	
 
 	InitDirLight();
 	//InitPtLight();
@@ -53,8 +67,7 @@ bool Game::Start()
 	player->Init(light);
 	backGround->Init(light);
 	
-
-	
+	//EffectEngine::GetInstance()->ResistEffect(0, u"Assets/effect/Sword_Lightning.efk");
 
 	shadow->Start();
 
@@ -65,10 +78,37 @@ void Game::Update()
 {
 	auto& renderContext = g_graphicsEngine->GetRenderContext();
 
+	if (g_pad[0]->IsTrigger(enButtonLB1))
+	{
+		/*enemy = NewGO<Enemy>(0, "enemy");
+		enemy->SetEnemyNo(1);*/
+
+		for (int i = 0;i < 100;i++) {
+			if (m_enemy[i]->GetOnFlag() == false) {
+				m_enemy[i]->SetEnemyNo(i);
+				return;
+			}
+			else if(i<100){
+
+			}
+			else{
+				return;
+			}
+		}
+	}
+
 	//SpotLight();
 	light.SetLight(directionLight, pointLight, spotLight);
 
 	shadow->UpdateShadow();
+
+	/*if (g_pad[0]->IsTrigger(enButtonA)) {
+		EffectEmitter* laserEffectEmitter = NewGO<EffectEmitter>(0);
+		laserEffectEmitter->Init(0);
+		laserEffectEmitter->SetScale({ 30.0f,30.0f,30.0f });
+		laserEffectEmitter->Play();
+
+	}*/
 
 	//RenderTarget* rtArray[] = { &offscreenRenderTarget };
 	//renderContext.WaitUntilToPossibleSetRenderTargets(1, rtArray);
@@ -116,91 +156,91 @@ void Game::InitModel(Model& bgModel, Model& teapotModel, Model& lightModel, Ligh
 	RootSignature rs;
 	InitRootSignature(rs);
 
-	offscreenRenderTarget.Create(
-		1280,
-		720,
-		1,
-		1,
-		DXGI_FORMAT_R32G32B32A32_FLOAT,
-		DXGI_FORMAT_D32_FLOAT
-	);
+	//offscreenRenderTarget.Create(
+	//	1280,
+	//	720,
+	//	1,
+	//	1,
+	//	DXGI_FORMAT_R32G32B32A32_FLOAT,
+	//	DXGI_FORMAT_D32_FLOAT
+	//);
 
-	mainRenderTarget.Create(
-		1280,
-		720,
-		1,
-		1,
-		DXGI_FORMAT_R32G32B32A32_FLOAT,
-		DXGI_FORMAT_D32_FLOAT
-	);
+	//mainRenderTarget.Create(
+	//	1280,
+	//	720,
+	//	1,
+	//	1,
+	//	DXGI_FORMAT_R32G32B32A32_FLOAT,
+	//	DXGI_FORMAT_D32_FLOAT
+	//);
 
-	ModelInitData boxModelInitData;
-	boxModelInitData.m_tkmFilePath = "Assets/modelData/box.tkm";
-	boxModelInitData.m_fxFilePath = "Assets/shader/offscreenRender.fx";
-	
-	boxModel.Init(boxModelInitData);
-	boxModel.UpdateWorldMatrix({ 100.0f,0.0f,0.0f }, g_quatIdentity, g_vec3One);
+	//ModelInitData boxModelInitData;
+	//boxModelInitData.m_tkmFilePath = "Assets/modelData/box.tkm";
+	//boxModelInitData.m_fxFilePath = "Assets/shader/offscreenRender.fx";
+	//
+	//boxModel.Init(boxModelInitData);
+	//boxModel.UpdateWorldMatrix({ 100.0f,0.0f,0.0f }, g_quatIdentity, g_vec3One);
 
-	boxModel.ChangeAlbedoMap(
-		"",
-		offscreenRenderTarget.GetRenderTargetTexture()
-	);
+	//boxModel.ChangeAlbedoMap(
+	//	"",
+	//	offscreenRenderTarget.GetRenderTargetTexture()
+	//);
 
-	
-	luminnceRenderTarget.Create(
-		1280,
-		720,
-		1,
-		1,
-		DXGI_FORMAT_R32G32B32A32_FLOAT,
-		DXGI_FORMAT_D32_FLOAT
-	);
+	//
+	//luminnceRenderTarget.Create(
+	//	1280,
+	//	720,
+	//	1,
+	//	1,
+	//	DXGI_FORMAT_R32G32B32A32_FLOAT,
+	//	DXGI_FORMAT_D32_FLOAT
+	//);
 
-	SpriteInitData luminanceSpriteInitData;
-	luminanceSpriteInitData.m_fxFilePath = "Assets/shader/samplePostEffect.fx";
-	luminanceSpriteInitData.m_vsEntryPointFunc = "VSMain";
-	luminanceSpriteInitData.m_psEntryPoinFunc = "PSSamplingLuminance";
-	luminanceSpriteInitData.m_width = 1280;
-	luminanceSpriteInitData.m_height = 720;
-	luminanceSpriteInitData.m_textures[0] = &mainRenderTarget.GetRenderTargetTexture();
-	luminanceSpriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32_FLOAT;
+	//SpriteInitData luminanceSpriteInitData;
+	//luminanceSpriteInitData.m_fxFilePath = "Assets/shader/samplePostEffect.fx";
+	//luminanceSpriteInitData.m_vsEntryPointFunc = "VSMain";
+	//luminanceSpriteInitData.m_psEntryPoinFunc = "PSSamplingLuminance";
+	//luminanceSpriteInitData.m_width = 1280;
+	//luminanceSpriteInitData.m_height = 720;
+	//luminanceSpriteInitData.m_textures[0] = &mainRenderTarget.GetRenderTargetTexture();
+	//luminanceSpriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32_FLOAT;
 
-	
-	luminanceSprite.Init(luminanceSpriteInitData);
+	//
+	//luminanceSprite.Init(luminanceSpriteInitData);
 
-	
-	gaussianBlur.Init(&luminnceRenderTarget.GetRenderTargetTexture());
-	
-	SpriteInitData finalSpriteInitData;
-	finalSpriteInitData.m_textures[0] = &gaussianBlur.GetBokeTexture();
-	finalSpriteInitData.m_width = 1280;
-	finalSpriteInitData.m_height = 720;
-	finalSpriteInitData.m_fxFilePath = "Assets/shader/sample2D.fx";
-	finalSpriteInitData.m_alphaBlendMode = AlphaBlendMode_Add;
-	finalSpriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	//
+	//gaussianBlur.Init(&luminnceRenderTarget.GetRenderTargetTexture());
+	//
+	//SpriteInitData finalSpriteInitData;
+	//finalSpriteInitData.m_textures[0] = &gaussianBlur.GetBokeTexture();
+	//finalSpriteInitData.m_width = 1280;
+	//finalSpriteInitData.m_height = 720;
+	//finalSpriteInitData.m_fxFilePath = "Assets/shader/sample2D.fx";
+	//finalSpriteInitData.m_alphaBlendMode = AlphaBlendMode_Add;
+	//finalSpriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
 
-	
-	finalSprite.Init(finalSpriteInitData);
+	//
+	//finalSprite.Init(finalSpriteInitData);
 
-	SpriteInitData spriteInitData;
-	spriteInitData.m_textures[0] = &mainRenderTarget.GetRenderTargetTexture();
-	spriteInitData.m_width = 1280;
-	spriteInitData.m_height = 720;
-	spriteInitData.m_fxFilePath = "Assets/shader/sample2D.fx";
-	
-	copyToFrameBufferSprite.Init(spriteInitData);
+	//SpriteInitData spriteInitData;
+	//spriteInitData.m_textures[0] = &mainRenderTarget.GetRenderTargetTexture();
+	//spriteInitData.m_width = 1280;
+	//spriteInitData.m_height = 720;
+	//spriteInitData.m_fxFilePath = "Assets/shader/sample2D.fx";
+	//
+	//copyToFrameBufferSprite.Init(spriteInitData);
 
 
-	ModelInitData lightModelInitData;
-	lightModelInitData.m_tkmFilePath = "Assets/modelData/light.tkm";
+	//ModelInitData lightModelInitData;
+	//lightModelInitData.m_tkmFilePath = "Assets/modelData/light.tkm";
 
-	// 使用するシェーダーファイルパスを設定する
-	lightModelInitData.m_fxFilePath = "Assets/shader/light.fx";
-	lightModelInitData.m_expandConstantBuffer = &light;
-	lightModelInitData.m_expandConstantBufferSize = sizeof(light);
+	//// 使用するシェーダーファイルパスを設定する
+	//lightModelInitData.m_fxFilePath = "Assets/shader/light.fx";
+	//lightModelInitData.m_expandConstantBuffer = &light;
+	//lightModelInitData.m_expandConstantBufferSize = sizeof(light);
 
-	// 初期化情報を使ってモデルを初期化する
-	lightModel.Init(lightModelInitData);
+	//// 初期化情報を使ってモデルを初期化する
+	//lightModel.Init(lightModelInitData);
 }
 
 void Game::InitDirLight()

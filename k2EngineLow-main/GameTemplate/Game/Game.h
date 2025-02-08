@@ -7,6 +7,9 @@ class Shadow;
 class Bullet;
 class Turret;
 class Lever;
+class SpriteRender;
+class Enemy;
+class NaviMap;
 class Game : public IGameObject
 {
 private:
@@ -17,6 +20,12 @@ private:
 	Bullet* bullet;
 	Turret* turret;
 	Lever* level;
+	Enemy* enemy;
+	NaviMap* naviMap;
+
+	Enemy* m_enemy[100];
+
+	SpriteRender* spriteRender;
 
 	Light light;
 	DirectionalLight directionLight;

@@ -3,6 +3,8 @@
 class GameCamera;
 class Bullet;
 class Turret;
+class Stand;
+class SpriteRender;
 class Player :public IGameObject
 {
 private:
@@ -40,8 +42,16 @@ private:
 	GameCamera* gameCamera;
 	Bullet* bullet;
 	Turret* turret;
+	SpriteRender* spriteRender;
 
 	Status m_status = Num;
+
+	bool m_targetFlag = false;
+	bool m_noAction = false;
+
+	//ここからプレイヤーのステータス。
+	int m_HP = 0;
+	int m_attack = 0;
 	
 public:
 	Player();
@@ -54,14 +64,25 @@ public:
 	void Move();
 	void Rotation();
 	void Animation();
+	const bool StandTarget();
 
-	const Vector3& GetPos() const
+	const Vector3& GetPos()
 	{
 		return m_charaCon.GetPosition();
 	}
 	const Quaternion& GetRot() const
 	{
 		return m_rotation;
+	}
+	//プレイヤーを操作不能にする。
+	void SetOutAction()
+	{
+		m_noAction = true;
+	}
+	//プレイヤーをアクション不可の状態から復帰させる。
+	void SetInAction() 
+	{
+		m_noAction = false;
 	}
 };
 

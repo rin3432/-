@@ -6,14 +6,19 @@ namespace nsK2EngineLow {
 	K2EngineLow* g_engine = nullptr;
 	GameTime* g_gameTime = nullptr;
 
+	//追加したコード。
+	CollisionObjectManager* g_collisionObjectManager = nullptr;
+
 	K2EngineLow::~K2EngineLow()
 	{
 		// グローバルなアクセスポイントにnullptrを代入。
 		g_graphicsEngine = nullptr;
 		g_gameTime = nullptr;
-		
+
+		g_collisionObjectManager = nullptr;
+
 		delete m_graphicsEngine;
-		
+
 		//ゲームオブジェクトマネージャーを削除。
 		GameObjectManager::DeleteInstance();
 		PhysicsWorld::DeleteInstance();
@@ -23,11 +28,13 @@ namespace nsK2EngineLow {
 	}
 	void K2EngineLow::Init(HWND hwnd, UINT frameBufferWidth, UINT frameBufferHeight)
 	{
+
 		if (hwnd) {
 			//グラフィックエンジンの初期化。
 			m_graphicsEngine = new GraphicsEngine();
 			m_graphicsEngine->Init(hwnd, frameBufferWidth, frameBufferHeight);
 		}
+
 		g_gameTime = &m_gameTime;
 		//ゲームパッドの初期化。
 		for (int i = 0; i < GamePad::CONNECT_PAD_MAX; i++) {
@@ -47,6 +54,8 @@ namespace nsK2EngineLow {
 			m_fpsFontShadow = std::make_unique<Font>();
 		}
 #endif
+		g_collisionObjectManager = nullptr;
+
 		g_engine = this;
 	}
 	void K2EngineLow::BeginFrame()
@@ -97,7 +106,7 @@ namespace nsK2EngineLow {
 		auto& renderContext = g_graphicsEngine->GetRenderContext();
 		// ゲームオブジェクトマネージャーの描画処理を実行。
 		GameObjectManager::GetInstance()->ExecuteRender(renderContext);
-		
+
 	}
 
 	/// <summary>

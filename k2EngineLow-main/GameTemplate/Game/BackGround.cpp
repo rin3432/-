@@ -6,7 +6,7 @@ bool BackGround::Start()
     return true;
 }
 
-void BackGround::Updata()
+void BackGround::Update()
 {
 	auto& renderContext = g_graphicsEngine->GetRenderContext();
 

@@ -110,5 +110,6 @@ static const int MAX_BONE = 512;	// ボーンの最大数。
 #include "sound/SoundSource.h"
 #include "graphics/effect/EffectEmitter.h"
 
-//ここから追加
+//ここから追加。
 #include "Light.h"
+#include "CollisionObject.h"

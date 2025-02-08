@@ -3,6 +3,9 @@
 #include "GameCamera.h"
 #include "Bullet.h"
 #include "Turret.h"
+#include "Stand.h"
+#include "SpriteRender.h"
+
 
 namespace {
 	Vector3 Zero = { 0.0f,0.0f,0.0f };
@@ -23,6 +26,8 @@ bool Player::Start()
 	gameCamera = FindGO<GameCamera>("gameCamera");
 	bullet = FindGO<Bullet>("bullet");
 	turret = FindGO<Turret>("turret");
+	spriteRender = FindGO<SpriteRender>("spriteRender");
+
 	m_charaCon.Init(25.0f, 75.0f, m_position);
 
 	return true;
@@ -54,6 +59,7 @@ void Player::Update()
 
 	m_model.Draw(renderContext);
 
+	//StandTarget();
 	Move();
 	Rotation();
 	Animation();
@@ -81,7 +87,7 @@ void Player::Render(RenderContext& rc)
 
 void Player::Init(Light& light)
 {
-	m_position = { 0.0f, 20.0f, 0.0f };
+	m_position = { 0.0f, 30.0f, 0.0f };
 
 	InitAnimation();
 
@@ -100,64 +106,75 @@ void Player::Init(Light& light)
 
 void Player::Move()
 {
-	m_moveSpeed.x = 0.0f;
-	m_moveSpeed.z = 0.0f;
-		
-	Vector3 stickL;
-	stickL.x = g_pad[0]->GetLStickXF();
-	stickL.y = g_pad[0]->GetLStickYF();
-	
-	Vector3 forward = g_camera3D->GetForward();
-	Vector3 right = g_camera3D->GetRight();
-	
-	forward.y = 0.0f;
-	right.y = 0.0f;
-	
-	right *= stickL.x * 120.0f;
-	forward *= stickL.y * 120.0f;
-	
-	m_moveSpeed += right + forward;
+	if (m_noAction == false) {
+		m_moveSpeed.x = 0.0f;
+		m_moveSpeed.z = 0.0f;
 
-	float speed = m_moveSpeed.Length();
+		Vector3 stickL;
+		stickL.x = g_pad[0]->GetLStickXF();
+		stickL.y = g_pad[0]->GetLStickYF();
 
-	if (speed == 0.0f) {
-		m_status = Idle;
-	}
-	else {
-		m_status = Walk;
-	}
-	
+		Vector3 forward = g_camera3D->GetForward();
+		Vector3 right = g_camera3D->GetRight();
+
+		forward.y = 0.0f;
+		right.y = 0.0f;
+
+		right *= stickL.x * 120.0f;
+		forward *= stickL.y * 120.0f;
+
+		m_moveSpeed += right + forward;
+
+		float speed = m_moveSpeed.Length();
+
+		if (speed == 0.0f) {
+			m_status = Idle;
+		}
+		else {
+			m_status = Walk;
+		}
+
 		//ダッシュとジャンプ
-	if (g_pad[0]->IsPress(enButtonA))
-	{
-		m_moveSpeed.y = 300.0f;
-	}
-	if (g_pad[0]->IsPress(enButtonB))
-	{
-		bullet->OnFlag();
-	}
-	if (g_pad[0]->IsTrigger(enButtonY))
-	{
-		turret->OnFlag();
-	}
-	if (g_pad[0]->IsPress(enButtonX))
-	{
-		m_moveSpeed = (right + forward) * 7.5;
-		m_status = Run;
-	}
+		if (g_pad[0]->IsTrigger(enButtonA))
+		{
+			///m_moveSpeed.y = 300.0f;
+		}
+		if (g_pad[0]->IsPress(enButtonB))
+		{
+			if (bullet->GetFlag() == false) {
+				bullet->OnFlag();
+			}
+		}
+		if (g_pad[0]->IsTrigger(enButtonY) /* && StandTarget() == true*/)
+		{
+			for (int i = 0;i < 100;i++) {
+				if (turret->m_attackTurret[i].GetUse() == false) {
+					turret->TryPut(i);
+					return;
+				}
+			}
+			// タレットを配置出来たら配置する
 
-	//重力。
-	if (m_charaCon.IsOnGround())
-	{
-		m_moveSpeed.y = 0.0f;
-	}
-	else
-	{
-		m_moveSpeed.y -= 10.0f;
-	}
+		}
+		if (g_pad[0]->IsPress(enButtonX))
+		{
+			m_moveSpeed = (right + forward) * 7.5;
+			m_status = Run;
+		}
 
-	//m_position += m_moveSpeed / 10.0f;//移動速度。
-	m_charaCon.Execute(m_moveSpeed, 1.0f / 20.0f);
+		//重力。
+		if (m_charaCon.IsOnGround())
+		{
+			//m_moveSpeed.y = 0.0f;
+		}
+		else
+		{
+			//m_moveSpeed.y -= 10.0f;
+		}
+
+		//m_position += m_moveSpeed / 10.0f;//移動速度。
+		m_charaCon.Execute(m_moveSpeed, 1.0f / 20.0f);
+	}
 }
 
 void Player::Rotation()
@@ -191,4 +208,18 @@ void Player::Animation()
 	default:
 		break;
 	}
+}
+
+const bool Player::StandTarget()
+{
+	const std::vector<Stand*>& stands = FindGOs<Stand>("stand");
+
+	int a = stands.size();
+
+	for (int i = 0;i < stands.size();i++) {
+		if (stands[i]->GetTargetFlag() == true) {
+			return true;
+		}
+	}
+	return false;
 }

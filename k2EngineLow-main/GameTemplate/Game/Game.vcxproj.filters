@@ -17,9 +17,12 @@
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="Bullet.cpp" />
-    <ClCompile Include="Raytracing.cpp" />
     <ClCompile Include="Turret.cpp" />
     <ClCompile Include="Lever.cpp" />
+    <ClCompile Include="Stand.cpp" />
+    <ClCompile Include="SpriteRender.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="NaviMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -32,8 +35,11 @@
     <ClInclude Include="GameCamera.h" />
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Bullet.h" />
-    <ClInclude Include="Raytracing.h" />
     <ClInclude Include="Turret.h" />
     <ClInclude Include="Lever.h" />
+    <ClInclude Include="Stand.h" />
+    <ClInclude Include="SpriteRender.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="NaviMap.h" />
   </ItemGroup>
 </Project>

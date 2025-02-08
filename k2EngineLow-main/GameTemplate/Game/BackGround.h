@@ -7,7 +7,7 @@ private:
 
 public:
 	bool Start();
-	void Updata();
+	void Update();
 	void Init(Light& light);
 	void Render(RenderContext& rc);
 };

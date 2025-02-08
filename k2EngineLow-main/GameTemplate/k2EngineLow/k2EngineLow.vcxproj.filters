@@ -237,6 +237,9 @@
     <ClCompile Include="SpotLight.cpp">
       <Filter>Light</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionObject.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="k2EngineLowPreCompile.h" />
@@ -523,6 +526,9 @@
     <ClInclude Include="SpotLight.h">
       <Filter>Light</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionObject.h">
+      <Filter>collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="graphics">
@@ -584,6 +590,9 @@
     </Filter>
     <Filter Include="Light">
       <UniqueIdentifier>{bdd125b4-7244-4ee9-85c9-9a6075308c50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collision">
+      <UniqueIdentifier>{97db81cd-f64e-4360-8256-4ceb9d716db4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
